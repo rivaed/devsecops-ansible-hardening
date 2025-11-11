@@ -1,0 +1,38 @@
+---
+- name: Aplicar Hardening Básico na VPS
+  # 'hosts:' aponta para o grupo que definimos no arquivo 'hosts'
+  hosts: vps_hostinger 
+  
+  # 'become: yes' diz ao Ansible para usar 'sudo' 
+  # (escalar privilégios) para rodar as tarefas.
+  become: yes 
+
+  tasks:
+    - name: 1. Atualizar todos os pacotes do sistema (apt)
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: 'yes'
+      
+    - name: 2. Garantir que o usuário 'hackermel' está no grupo 'sudo'
+      ansible.builtin.user:
+        name: hackermel
+        groups: sudo
+        append: yes
+        state: present
+
+    - name: 3. Desabilitar login SSH do usuário 'root'
+      # Edita a linha 'PermitRootLogin' no arquivo de configuração do SSH
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PermitRootLogin'
+        line: 'PermitRootLogin no'
+      # 'notify:' avisa o 'handler' abaixo para rodar
+      notify: Reiniciar SSH
+
+  # Handlers são tarefas especiais que só rodam se
+  # uma tarefa com 'notify' reportar uma mudança.
+  handlers:
+    - name: Reiniciar SSH
+      ansible.builtin.service:
+        name: sshd
+        state: restarted
