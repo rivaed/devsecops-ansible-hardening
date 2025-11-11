@@ -45,7 +45,7 @@
         default: allow
         direction: outgoing
 
-    - name: 7. Permitir portas essenciais (SSH, HTTP, HTTPS)
+    - name: 7. Permitir portas essenciais (SSH, HTTP, HTTPS, KeyCloak, Postgres)
       community.general.ufw:
         rule: allow
         port: "{{ item }}"
@@ -54,6 +54,8 @@
         - '22'    # SSH (Crucial!)
         - '80'    # HTTP (para seu site)
         - '443'   # HTTPS (para seu site)
+        - '8080'  # Keycloak
+        - '5432'  # PostgreSQL
 
     - name: 8. Ativar o UFW
       community.general.ufw:
