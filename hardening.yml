@@ -29,6 +29,36 @@
       # 'notify:' avisa o 'handler' abaixo para rodar
       notify: Reiniciar SSH
 
+
+    - name: 4. Instalar o UFW (Uncomplicated Firewall)
+      ansible.builtin.apt:
+        name: ufw
+        state: present
+
+    - name: 5. Negar todo tráfego de entrada (Default Deny)
+      community.general.ufw:
+        default: deny
+        direction: incoming
+
+    - name: 6. Permitir todo tráfego de saída
+      community.general.ufw:
+        default: allow
+        direction: outgoing
+
+    - name: 7. Permitir portas essenciais (SSH, HTTP, HTTPS)
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+      # 'with_items' roda a tarefa para cada item da lista
+      with_items:
+        - '22'    # SSH (Crucial!)
+        - '80'    # HTTP (para seu site)
+        - '443'   # HTTPS (para seu site)
+
+    - name: 8. Ativar o UFW
+      community.general.ufw:
+        state: enabled
+
   # Handlers são tarefas especiais que só rodam se
   # uma tarefa com 'notify' reportar uma mudança.
   handlers:
