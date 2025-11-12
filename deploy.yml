@@ -24,36 +24,36 @@
         owner: hackermel
         group: hackermel
 
-    - name: 4. Configurar o Nginx para servir o site React
-      ansible.builtin.copy:
-        dest: /etc/nginx/sites-available/site-rivaed
-        content: |
-          server {
-              listen 80;
-              server_name 72.61.36.143; # Ou seu futuro domínio
-
-              root /var/www/site-rivaed;
-              index index.html index.htm;
-
-              location / {
-                  # Esta é a mágica para o React Router!
-                  try_files $uri $uri/ /index.html;
-              }
-          }
-      notify: Reiniciar Nginx
-
-    - name: 5. Ativar o novo site (criar link simbólico)
-      ansible.builtin.file:
-        src: /etc/nginx/sites-available/site-rivaed
-        dest: /etc/nginx/sites-enabled/site-rivaed
-        state: link
-      notify: Reiniciar Nginx
-
-    - name: 6. Remover o site padrão do Nginx
-      ansible.builtin.file:
-        path: /etc/nginx/sites-enabled/default
-        state: absent
-      notify: Reiniciar Nginx
+#    - name: 4. Configurar o Nginx para servir o site React
+#      ansible.builtin.copy:
+#        dest: /etc/nginx/sites-available/site-rivaed
+#        content: |
+#          server {
+#              listen 80;
+#              server_name eduardoriva.com www.eduardoriva.com
+#
+#              root /var/www/site-rivaed;
+#              index index.html index.htm;
+#
+#              location / {
+#                  # Esta é a mágica para o React Router!
+#                  try_files $uri $uri/ /index.html;
+#              }
+#          }
+#      notify: Reiniciar Nginx
+#
+#    - name: 5. Ativar o novo site (criar link simbólico)
+#      ansible.builtin.file:
+#        src: /etc/nginx/sites-available/site-rivaed
+#        dest: /etc/nginx/sites-enabled/site-rivaed
+#        state: link
+#      notify: Reiniciar Nginx
+#
+#    - name: 6. Remover o site padrão do Nginx
+#      ansible.builtin.file:
+#        path: /etc/nginx/sites-enabled/default
+#        state: absent
+#      notify: Reiniciar Nginx
 
     - name: 7. Fazer deploy dos arquivos do site (copiar 'dist')
       become: no 

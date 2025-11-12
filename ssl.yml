@@ -1,0 +1,40 @@
+---
+- name: Proteger Nginx com Certbot (Let's Encrypt SSL)
+  hosts: vps_hostinger
+  become: yes
+
+  tasks:
+    - name: 1. Instalar Certbot e o plugin do Nginx
+      ansible.builtin.apt:
+        name:
+          - certbot
+          - python3-certbot-nginx
+        state: present
+        update_cache: yes
+
+    - name: 2. Gerar o certificado SSL e configurar Nginx
+      ansible.builtin.command:
+        # 'certbot --nginx' lê sua config do Nginx e a atualiza
+        cmd: >
+          certbot --nginx \
+            --non-interactive \
+            --agree-tos \
+            --redirect \
+            -m contato@eduardoriva.com \
+            -d eduardoriva.com \
+            -d www.eduardoriva.com
+        # 'creates:' impede que o comando rode novamente se o certificado já existir
+        creates: /etc/letsencrypt/live/eduardoriva.com/fullchain.pem
+      notify: Reiniciar Nginx
+
+    - name: 3. Garantir que a renovação automática está habilitada
+      ansible.builtin.service:
+        name: certbot.timer
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Reiniciar Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
