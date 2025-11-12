@@ -1,0 +1,38 @@
+---
+- name: Deploy da Stack de Monitoramento (Prometheus + Grafana)
+  hosts: vps_hostinger
+  become: yes
+
+  tasks:
+    - name: 1. Garantir que o 'docker-compose' está instalado
+      ansible.builtin.apt:
+        name: docker-compose-plugin # 'docker compose' (nova versão)
+        state: present
+        update_cache: yes
+      # Ignora erros caso o pacote não exista (pode ser 'docker-compose')
+      ignore_errors: yes 
+
+    - name: 2. Criar diretório para a stack de monitoramento
+      ansible.builtin.file:
+        path: /opt/monitoring
+        state: directory
+        mode: '0755'
+        owner: hackermel
+        group: hackermel
+
+    - name: 3. Copiar arquivos de configuração (docker-compose.yml e prometheus.yml)
+      # 'become: no' para copiar como 'hackermel' para a pasta do 'hackermel'
+      become: no 
+      ansible.builtin.copy:
+        src: files/monitoring/ # Copia o conteúdo da pasta
+        dest: /opt/monitoring/
+        mode: '0644'
+
+    - name: 4. Subir os containers de monitoramento com Docker Compose
+      # 'become: no' para rodar como 'hackermel', que tem acesso ao Docker
+      become: no
+      ansible.builtin.command:
+        # Usamos o 'docker compose' (com espaço)
+        cmd: docker compose up -d
+        # 'chdir:' roda o comando dentro deste diretório
+        chdir: /opt/monitoring

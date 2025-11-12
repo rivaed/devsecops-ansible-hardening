@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 15s # A cada 15s
+
+scrape_configs:
+  # 1. Monitorar o próprio Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 2. Monitorar o Node Exporter (nossa VPS)
+  - job_name: 'node_exporter'
+    static_configs:
+      # Usamos o IP da sua VPS, pois o Node Exporter
+      # está rodando na rede do host
+      - targets: ['72.61.36.143:9100']
