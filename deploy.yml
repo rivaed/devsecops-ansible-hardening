@@ -62,7 +62,7 @@
         # 'src:' é a pasta 'dist' NO SEU MAC.
         # Ajuste este caminho se o nome da pasta do seu site não for 'site-eduardo'
         # O '/' no final é crucial: copia o CONTEÚDO da pasta dist.
-        src: ../site-eduardo/site-eduardo/dist/
+        src: ../portfolio-react-spa/dist/
         
         # 'dest:' é a pasta que criamos na VPS
         dest: /var/www/site-rivaed
