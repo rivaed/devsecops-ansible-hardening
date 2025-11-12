@@ -55,7 +55,7 @@
         - '80'    # HTTP (para seu site)
         - '443'   # HTTPS (para seu site)
         - '8080'  # Keycloak
-        - '5432'  # PostgreSQL
+#       - '5432'  # PostgreSQL
         - '9090'  # Prometheus
         - '3000'  # Grafana
         - '9100'  # Node Exporter 

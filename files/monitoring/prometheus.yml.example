@@ -12,4 +12,4 @@ scrape_configs:
     static_configs:
       # Usamos o IP da sua VPS, pois o Node Exporter
       # está rodando na rede do host
-      - targets: ['72.61.36.143:9100']
+      - targets: ['SEU_IP_AQUI:9100']

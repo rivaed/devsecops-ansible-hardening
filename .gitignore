@@ -1,0 +1,5 @@
+# Arquivo de inventário real com IPs
+hosts
+
+# Arquivo de configuração real com IPs
+files/monitoring/prometheus.yml
