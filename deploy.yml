@@ -1,0 +1,77 @@
+---
+- name: Instalar e configurar o Nginx para o site
+  hosts: vps_hostinger
+  become: yes
+
+  tasks:
+    - name: 1. Instalar Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: yes
+    
+    - name: 2. Iniciar e habilitar o serviço Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: 3. Criar diretório para o site
+      ansible.builtin.file:
+        path: /var/www/site-rivaed
+        state: directory
+        mode: '0755'
+        owner: hackermel
+        group: hackermel
+
+    - name: 4. Configurar o Nginx para servir o site React
+      ansible.builtin.copy:
+        dest: /etc/nginx/sites-available/site-rivaed
+        content: |
+          server {
+              listen 80;
+              server_name 72.61.36.143; # Ou seu futuro domínio
+
+              root /var/www/site-rivaed;
+              index index.html index.htm;
+
+              location / {
+                  # Esta é a mágica para o React Router!
+                  try_files $uri $uri/ /index.html;
+              }
+          }
+      notify: Reiniciar Nginx
+
+    - name: 5. Ativar o novo site (criar link simbólico)
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/site-rivaed
+        dest: /etc/nginx/sites-enabled/site-rivaed
+        state: link
+      notify: Reiniciar Nginx
+
+    - name: 6. Remover o site padrão do Nginx
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: Reiniciar Nginx
+
+    - name: 7. Fazer deploy dos arquivos do site (copiar 'dist')
+      become: no 
+      # Usamos synchronize (rsync) por ser mais rápido
+      ansible.posix.synchronize:
+        # 'src:' é a pasta 'dist' NO SEU MAC.
+        # Ajuste este caminho se o nome da pasta do seu site não for 'site-eduardo'
+        # O '/' no final é crucial: copia o CONTEÚDO da pasta dist.
+        src: ../site-eduardo/site-eduardo/dist/
+        
+        # 'dest:' é a pasta que criamos na VPS
+        dest: /var/www/site-rivaed
+        archive: yes
+        delete: yes # Apaga arquivos antigos na VPS
+      notify: Reiniciar Nginx # Limpa o cache do Nginx
+
+  handlers:
+    - name: Reiniciar Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
